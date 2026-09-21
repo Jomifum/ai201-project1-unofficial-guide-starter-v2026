@@ -21,11 +21,7 @@
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
-     Milestone 5. -->
+This project builds a small retrieval-augmented QA system for the campus_life corpus, which contains student-written advice and logistics posts about classes, housing, dining, and campus policy. The app ingests text files, splits them into chunks, embeds them, retrieves the closest matches to a question, and then answers only from those retrieved documents. The goal is to give grounded, source-backed answers to concrete student-life questions while refusing questions that clearly fall outside the corpus.
 
 ## Chunking Strategy
 
@@ -118,9 +114,9 @@ I used the actual retrieval distances from my five in-corpus questions and my fi
 
      Milestone 5. -->
 
-**1.**
+**1.** I asked an AI model to help me design a chunker for the campus_life corpus after I noticed the default fixed-size splitter was leaving entire posts unsplit. The first version it suggested used sentence breaks but still kept a fixed 800-character window, which meant it could cut through a sentence and still leave unrelated details in the same chunk. I changed the strategy to keep short posts intact, split longer content on sentence boundaries, and add a modest overlap so neighboring chunks still share enough context. The final code in chunker.py reflects the result of that adjustment.
 
-**2.**
+**2.** I asked an AI assistant to help me choose a relevance cutoff by comparing the distances of in-corpus and out-of-scope questions. It proposed a number that looked reasonable but was too close to the in-corpus cluster, so I checked the actual retrieval distances from my five test questions and five out-of-scope questions and placed the cutoff in the gap between the two groups. That led me to set the threshold to 0.7 instead of leaving the starter's 0.6 in place, and it improved the gate behavior without rejecting valid campus-life questions.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
