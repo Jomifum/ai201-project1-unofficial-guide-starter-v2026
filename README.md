@@ -161,17 +161,17 @@ The project ran against the five questions in [questions.py](questions.py) and t
 | 4. Sampled chunks stand alone as complete thoughts | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET |
 | 5. Answers include the specific fact asked for | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET |
 
-The run produced real output in the results file. For example, the first question answered correctly from the housing-lottery document, and the gate refused all five out-of-scope questions. The evidence file names the source and the function that produced the chunks (`chunker.py::split_documents`).
+The run produced real output in the results file. For example, the first question was answered from the housing-lottery document, and the gate refused all five out-of-scope questions. The evidence file names the source and the function that produced the chunks (`chunker.py::split_documents`). Because `run_eval.py` has no `scorer.py` in this project, the pass counts below are manual judgments from the recorded answers, not automated verdicts.
 
 ## Verdicts
 
 | # | Criterion | Verdict | How I decided |
 |---|---|---|---|
 | 1 | Retrieved chunk contains the answer | MET | All five in-scope questions retrieved a chunk containing the answer, and the best distance was always under the cutoff. |
-| 2 | Every answer names a source | MET | Each answer included a Source line naming a real document such as `admin_housing_lottery.txt` and `admin_add_drop_deadline.txt`. |
+| 2 | Every answer names a source | MET | Each recorded answer identified a real source, either with a `Source:` line or an inline parenthetical such as `admin_housing_lottery.txt`. |
 | 3 | Gate stops out-of-corpus questions | MET | All five out-of-scope topics were refused by the gate, with best distances between 0.825 and 0.934. |
 | 4 | Sampled chunks stand alone as complete thoughts | MET | The five sample chunks printed by `python app.py chunks -n 5` each read as a complete thought and could be answered from without surrounding context. |
-| 5 | Answers include the specific fact asked for | MET | Each answer included the concrete fact the question asked for, such as the credit-hours rule, the add/drop week, or the parking permit timing. |
+| 5 | Answers include the specific fact asked for | MET | Four answers supplied the requested fact directly. The east-lot answer supplied the 12-minute walk and correctly said the documents did not support the question's claim about why students prefer it, rather than inventing a reason. |
 
 ## Diagnoses
 
@@ -185,7 +185,7 @@ There were no misses. The system met all five of the targets in the before run, 
 
 ### Run Log — After
 
-The after log is the same measurement with the same cutoff and the same criteria because the improvement was a source-narrowing usability feature rather than a change to the core retrieval threshold. I created the after evidence file in [results/run_2026-09-20_2331_after.md](results/run_2026-09-20_2331_after.md).
+The after log uses the same questions, cutoff, corpus, and three-run format because the improvement was a source-narrowing usability feature rather than a change to the core retrieval threshold. I created the after evidence file in [results/run_2026-09-20_2331_after.md](results/run_2026-09-20_2331_after.md). The script reports blank automated verdict columns because this project does not include `scorer.py`; the criterion verdicts below are manual reviews of the actual answers in that file.
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
@@ -195,14 +195,12 @@ The after log is the same measurement with the same cutoff and the same criteria
 | 4. Sampled chunks stand alone as complete thoughts | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET |
 | 5. Answers include the specific fact asked for | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET |
 
-**Did it help?** It helped as a narrowing feature for source-specific exploration, but it did not materially change the core quality metrics. The acceptance targets stayed the same and the gate still rejected the out-of-scope questions, which is the relevant evidence for this project.
+**Did it help?** Yes, for source-specific exploration: the filtered housing-lottery query returned only `admin_housing_lottery.txt`, while the unfiltered query returned five nearby matches. It did not materially change the core quality metrics because it was a usability feature, not a change to chunking, retrieval cutoff, or generation. The after run still retrieved all five in-scope answers under the 0.7 cutoff and refused all five out-of-scope questions.
 
 ## What's Still Broken
 
-No criterion is still missed in the measured before/after evaluation. The only remaining limitation is that the project does not yet include a custom `scorer.py` to automate verdicts automatically, but the run log and manual checks still satisfy the grading requirement for the evidence and diagnosis that was required here.
+No criterion is still missed in the measured before/after evaluation. The remaining limitation is that the project does not include a custom `scorer.py`, so the run logs contain raw answers rather than automated pass/fail verdicts; the criterion judgments here are manual and traceable to those recorded answers.
 
 ## What I'd Do Differently
 
-If I were writing this again, I would still keep the same five criteria and the same cutoff because they reflect the actual structure of the campus_life corpus. The main thing I would tighten is the operational detail in the README: I would add the before and after run logs immediately after running `run_eval.py`, so the evidence is easier to audit and easier to compare without needing to reconstruct it later.
-
-     Milestone 5. -->
+If I were writing this again, I would keep the same five criteria and the 0.7 cutoff because they reflect the actual campus_life corpus and the measured distance gap. I would add `scorer.py` earlier so the next evaluation could record automated verdicts as well as raw answers, while still reviewing grounded refusals such as the east-lot answer manually.
