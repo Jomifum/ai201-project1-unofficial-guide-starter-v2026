@@ -22,6 +22,7 @@ to it, write down what you saw, and move on. That's a real observation about
 your pipeline, not giving up.
 """
 
+import re
 from dataclasses import dataclass
 
 import config
@@ -81,23 +82,84 @@ def fallback_split(
 
 
 def split_documents(documents: list[Document]) -> list[Chunk]:
+    """Split short documents into sentence-aware chunks.
+
+    The campus_life corpus is mostly short student posts: a document is usually
+    one to three sentences, and the useful detail is often contained in a single
+    sentence rather than spread across a long section. This chunker therefore
+    keeps whole short posts together, but will split longer text on sentence
+    boundaries so a sentence is not cut in half at the chunk boundary.
     """
-    Split documents into chunks. ⚠️ REPLACE THE BODY OF THIS IN MILESTONE 3.
+    chunk_size = config.CHUNK_SIZE
+    overlap = config.CHUNK_OVERLAP
 
-    Right now it just calls the fallback. That is the plain, generic behaviour
-    the brief is talking about.
+    if overlap >= chunk_size:
+        raise ValueError("overlap has to be smaller than chunk_size")
 
-    When you write your own strategy, set `produced_by` to
-    "chunker.py::split_documents" so your README's Sample Chunks section names
-    the right function. `app.py chunks` prints that string for you.
+    chunks: list[Chunk] = []
+    for doc in documents:
+        text = re.sub(r"\s+", " ", doc.text).strip()
+        if not text:
+            continue
 
-    Things worth thinking about before you write any code:
-      - Are your documents short posts or long guides?
-      - Is the useful information in one sentence, or spread over a paragraph?
-      - Would splitting on paragraph breaks keep more thoughts intact than
-        splitting on a character count?
-    """
-    return fallback_split(documents)
+        segments = re.split(r"(?<=[.!?])\s+|\n\s*\n+", text)
+        segments = [segment.strip() for segment in segments if segment.strip()]
+        if not segments:
+            continue
+
+        current = ""
+        index = 0
+
+        for segment in segments:
+            candidate = f"{current} {segment}".strip() if current else segment
+            if len(candidate) <= chunk_size:
+                current = candidate
+                continue
+
+            if current:
+                chunks.append(
+                    Chunk(
+                        text=current.strip(),
+                        source=doc.source,
+                        index=index,
+                        produced_by="chunker.py::split_documents",
+                    )
+                )
+                index += 1
+                if overlap and len(current) > overlap:
+                    current = current[-overlap:].strip() + " " + segment
+                else:
+                    current = segment
+            else:
+                # Very long single segment: split on character boundaries without
+                # breaking a sentence if we can avoid it.
+                start = 0
+                while start < len(segment):
+                    piece = segment[start : start + chunk_size].strip()
+                    if piece:
+                        chunks.append(
+                            Chunk(
+                                text=piece,
+                                source=doc.source,
+                                index=index,
+                                produced_by="chunker.py::split_documents",
+                            )
+                        )
+                        index += 1
+                    start += max(1, chunk_size - overlap)
+                current = ""
+
+        if current.strip():
+            chunks.append(
+                Chunk(
+                    text=current.strip(),
+                    source=doc.source,
+                    index=index,
+                    produced_by="chunker.py::split_documents",
+                )
+            )
+
+    return chunks
 
 
 def describe(chunks: list[Chunk]) -> str:
