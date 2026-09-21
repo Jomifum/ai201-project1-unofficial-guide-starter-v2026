@@ -23,8 +23,10 @@ For at least 4 of my 5 test questions, the retrieved chunks include one that
 contains the answer.
 
 **Why this target:**
-<!-- e.g. "One of my questions is about a topic only two documents mention, so
-     I expect that one to be hard." -->
+This corpus contains short, direct student posts, so the useful fact is often a
+single sentence. If the retrieval is working, at least four of the five
+questions should land on a chunk with the answer in it without needing a broad
+search.
 
 ---
 
@@ -33,8 +35,10 @@ contains the answer.
 Every answer the system produces names at least one source document.
 
 **Why this target:**
-<!-- Why all five and not four? What about your setup makes that achievable —
-     or what would have to go wrong for it not to be? -->
+The project asks for source attribution as a core behavior, and this corpus has
+many short documents that can be traced back to one file. I want the answer to
+be tied to a real document in every case, because a citation-free answer would
+not be reliable enough for a student-facing guide.
 
 ---
 
@@ -44,54 +48,37 @@ When I ask a question my documents clearly don't cover, the relevance gate
 stops it and the system returns "I don't have enough information about that" —
 in at least 4 of 5 tries.
 
-<!-- The five questions are the ones in `OUT_OF_SCOPE` at the bottom of
-     `questions.py`, and `run_eval.py` puts them through the gate and writes
-     what happened into your run log. Swap them for your own if you'd rather —
-     just keep five of them, or the "4 of 5" above has nothing to be 4 of. -->
-
 **Why this target:**
-<!-- What did your distances look like when you set the cutoff in Milestone 4?
-     Was there a clean gap, or did the two groups overlap? -->
+My corpus is about campus life and university logistics, so a question about
+Mongolia, car maintenance, or Rust is far outside the scope of the documents.
+A cutoff that blocks at least four of those five should be strict enough to
+keep the system from making up an answer from unrelated material.
 
 ---
 
 ## 4. Something about your chunks
 
-<!-- YOU WRITE THIS ONE.
-
-     How would you know if your chunks were the right size? Name something
-     countable or observable.
-
-     Examples of the right shape — don't copy these, they should come from
-     what you actually saw in Milestone 3:
-       - "At least 4 of 5 sampled chunks read as a complete thought, with no
-          sentence cut in half at either end."
-       - "No chunk is shorter than 200 characters, since anything below that
-          in my corpus turned out to be a heading with no content under it." -->
-
-
+At least 4 of 5 sampled chunks should read as a complete thought, with no
+sentence broken in half at either end.
 
 **Why this target:**
-
-
+The campus_life documents are short posts where the useful information is often a
+single sentence. If a chunk cuts through a sentence or leaves a half-finished
+thought, the answer becomes harder to trust and the retrieval system is less
+reliable.
 
 ---
 
 ## 5. Your choice
 
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. It could be about
-     speed, about refusals, about a particular kind of question your corpus
-     handles badly, about source attribution being correct rather than merely
-     present — anything, as long as it names a number or an observable
-     outcome. -->
-
-
+At least 4 of 5 answers should include the specific fact the question asks for,
+not just a vague paraphrase of the topic.
 
 **Why this target:**
-
-
+The questions are deliberately precise, and the answers in this corpus are often
+fact-based rather than open-ended. I care about correctness of the actual detail
+— like a week number, a time, or a percentage — more than about giving a broad
+but unhelpful summary.
 
 ---
 
