@@ -29,18 +29,10 @@
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size:** 550 characters
+**Overlap:** 80 characters
 
-<!-- What about YOUR documents made you pick these numbers? Short posts and
-     long sectioned guides don't want the same chunking, and "800 seemed
-     reasonable" earns nothing. Point at something you noticed when you read
-     the documents in Milestone 1.
-
-     If you changed your mind partway through, say so and say why. That's worth
-     more than pretending you got it right first time.
-
-     Milestone 3. -->
+The campus_life corpus is made of short student posts, and the useful fact is often a single sentence rather than a long passage. I kept the chunks large enough to retain the full thought but small enough that a single answer does not get buried in unrelated text. The shorter documents mostly stay intact, while longer ones still split on sentence boundaries instead of cutting randomly through a paragraph.
 
 ## Sample Chunks
 
@@ -53,29 +45,34 @@
 
      Milestone 3. -->
 
-**Chunk 1** — source: `` — produced by: ``
+**Chunk 1** — source: `admin_add_drop_deadline.txt` — produced by: `chunker.py::split_documents`
 
 ```
+On the add/drop deadline You can add a course through the end of the second week. Dropping is a longer window — through the end of week six — but a drop after week two shows as a W on your transcript. Nothing anywhere on the registrar's site says this plainly, and students find out from each other.
 ```
 
-**Chunk 2** — source: `` — produced by: ``
+**Chunk 2** — source: `course_biol_160.txt` — produced by: `chunker.py::split_documents`
 
 ```
+BIOL 160 Cell Biology I lived here my sophomore year. Format is lecture three times a week with a weekly lab. Assessment: four unit tests and a cumulative final. Not curved. Expect 9 to 11 hours a week, the heaviest first-year course by reputation. The one piece of advice: the unit tests come fast, roughly every three weeks; falling behind once is very hard to recover from.
 ```
 
-**Chunk 3** — source: `` — produced by: ``
+**Chunk 3** — source: `course_hist_118_workload.txt` — produced by: `chunker.py::split_documents`
 
 ```
+Workload for HIST 118 Modern World History People keep asking so: a lot of reading, about 120 pages a week, but no problem sets. That's real time, not optimistic time. It's front-loaded — the first month is heavier than the rest, partly because you're learning the format.
 ```
 
-**Chunk 4** — source: `` — produced by: ``
+**Chunk 4** — source: `dining_pellew_dining_hall_followup.txt` — produced by: `chunker.py::split_documents`
 
 ```
+Re: Pellew Dining Hall Adding to what people have said about Pellew Dining Hall. The wait figure of 12 to 18 minutes at peak matches what I've seen. If you're trying to eat between classes, go before 11:45 and it's a different building entirely. Also worth saying: the furthest hall from anywhere, next to the athletics centre. Nobody tells you this at orientation.
 ```
 
-**Chunk 5** — source: `` — produced by: ``
+**Chunk 5** — source: `housing_innisfree_hall.txt` — produced by: `chunker.py::split_documents`
 
 ```
+Innisfree Hall — what it's actually like Transferred in last year, so take this with a grain of salt. Built 1991, renovated 2022. Rooms are doubles arranged as pairs sharing one bathroom between two rooms. The good: the shared-bathroom-between-two-rooms arrangement is the best compromise on campus. The bad: no air conditioning, which matters for the first three weeks of September. Laundry costs $1.75 wash, $1.75 dry, app-based. On noise: moderate; the building is L-shaped and the short wing is much quieter.
 ```
 
 ## Sample Answer
@@ -83,27 +80,32 @@
 <!-- One complete question and answer, pasted as text, with the source line
      visible. Milestone 4. -->
 
-**Question:**
+**Question:** is the housing lottery random?
 
 **Answer:**
 
 ```
+The housing lottery is not entirely random in the way most people assume. While rising sophomores get a number drawn at random, juniors and seniors are ordered by accumulated credit hours first, and random tie-breaking is only used for ties.
+
+Source: admin_housing_lottery.txt
 ```
 
-**My relevance cutoff:**
+**My relevance cutoff:** 0.7
 
-<!-- The number you set in config.py, and how you got there.
-
-     You ran five questions your corpus covers and the five in OUT_OF_SCOPE
-     that it clearly doesn't, and wrote down the best distance for each. What
-     did those two groups look like? Where was the gap? Put the actual numbers
-     here — the table below wants all ten rows.
-
-     Milestone 4. -->
+I used the actual retrieval distances from my five in-corpus questions and my five out-of-scope questions to place the cutoff in the gap. In-scope distances ranged from about 0.15 to 0.50, while out-of-scope questions stayed between about 0.82 and 0.93, so 0.7 sits safely between the two groups and rejects unrelated questions without blocking the answers this corpus actually contains.
 
 | Question | In corpus? | Best distance |
 |---|---|---|
-|  |  |  |
+| Is the housing lottery random for juniors and seniors, or are they sorted by credit hours first? | Yes | 0.1508 |
+| Through what week can a student add a course, and when does a drop after week two show up on the transcript? | Yes | 0.1788 |
+| When do student parking permits for the west lots go on sale, and how quickly do they sell out? | Yes | 0.1790 |
+| In CS 210, what percentage of the grade comes from labs, and what advice do students give about doing them? | Yes | 0.3852 |
+| How far is the east parking lot from campus, and why do some students prefer it even though it is farther away? | Yes | 0.4995 |
+| What is the capital of Mongolia? | No | 0.8246 |
+| How do I change the oil in a diesel engine? | No | 0.9340 |
+| Who won the 1994 World Cup? | No | 0.8859 |
+| What is the recommended dosage of ibuprofen for a headache? | No | 0.8442 |
+| How do I write a for loop in Rust? | No | 0.8960 |
 
 ## How I Used AI
 
